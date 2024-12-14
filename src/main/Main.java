@@ -1,8 +1,10 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.Console;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -71,11 +73,23 @@ public class Main {
     }
 
     private static void login(Scanner scanner, String arquivoUsuarios) {
+        Console console = System.console();
+        if (console == null) {
+            System.err.println("Não é possível obter o console.");
+            System.exit(1);
+        }
+        
         System.out.print("Digite seu email: ");
         scanner.nextLine();
         String email = scanner.nextLine();
         System.out.print("Digite sua senha: ");
-        String senha = scanner.nextLine();
+        char[] senhaChar = console.readPassword();
+        String senha = new String(senhaChar);
+
+        // Limpar o array de senha
+        Arrays.fill(senhaChar, '\u0000');
+        
+        // String senha = scanner.nextLine();
 
         try (BufferedReader br = new BufferedReader(new FileReader(arquivoUsuarios))) {
             String linha;
