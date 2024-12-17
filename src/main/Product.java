@@ -1,15 +1,20 @@
 
 public class Product {
+    private static int contadorProdutos = 0; // Gerador automático de número do pedido
+    
     private int id;
     private String nome;
     private String descricao;
+    private String categoria;
     private double preco;
     private int quantidadeEstoque;
 
     // Construtor
-    public Product(String nome, String descricao, double preco, int quantidadeEstoque) {
+    public Product(String nome, String descricao, double preco, int quantidadeEstoque, String categoria) {
+        this.id = ++contadorProdutos;
         this.nome = nome;
         this.descricao = descricao;
+        this.categoria = categoria;
         this.preco = preco;
         this.quantidadeEstoque = quantidadeEstoque;
     }
@@ -37,6 +42,14 @@ public class Product {
 
     public void setDescricao(String descricao) {
         this.descricao = descricao;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public double getPreco() {
@@ -81,6 +94,7 @@ public class Product {
                 "id=" + id +
                 ", nome='" + nome + '\'' +
                 ", descricao='" + descricao + '\'' +
+                ", categoria='" + categoria + '\'' +
                 ", preco=" + preco +
                 ", quantidadeEstoque=" + quantidadeEstoque +
                 '}';

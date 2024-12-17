@@ -4,12 +4,24 @@ import java.io.Console;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
+
+    class Cliente {
+        private String address;
+        private List<Order> historicoCompras = new ArrayList<>();
+    
+        public void adicionarPedido(Order pedido) {
+            historicoCompras.add(pedido);
+        }
+    }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -35,6 +47,8 @@ public class Main {
     }
 
     private static List<Product> produtos = new ArrayList<>();
+    private static List<ShoppingCart> carrinho = new ArrayList<>();
+    private static List<Order> pedidos = new ArrayList<>();
     // private static List<User> usuarios = new ArrayList<>();
 
     private static void cadastrarUsuario(Scanner scanner, String arquivoUsuarios) {
@@ -57,7 +71,7 @@ public class Main {
         String isAdministrador = scanner.nextLine().toLowerCase();
 
         try (FileWriter fw = new FileWriter(arquivoUsuarios, true);
-             BufferedWriter bw = new BufferedWriter(fw)) {
+                BufferedWriter bw = new BufferedWriter(fw)) {
             bw.write(email + ":" + senha + ":" + isAdministrador + "\n");
             System.out.println("Usuário cadastrado com sucesso!");
         } catch (IOException e) {
@@ -71,7 +85,7 @@ public class Main {
             System.err.println("Não é possível obter o console.");
             System.exit(1);
         }
-        
+
         System.out.print("Digite seu email: ");
         scanner.nextLine();
         String email = scanner.nextLine();
@@ -81,7 +95,6 @@ public class Main {
 
         // Limpar o array de senha
         Arrays.fill(senhaChar, '\u0000');
-        
 
         try (BufferedReader br = new BufferedReader(new FileReader(arquivoUsuarios))) {
             String linha;
@@ -119,35 +132,38 @@ public class Main {
             switch (opcao) {
                 case 1:
                     System.out.print("Digite o nome do produto: ");
+                    scanner.nextLine();
                     String nome = scanner.nextLine();
-                
+
+                    System.out.print("Digite a categoria do produto: ");
+                    String categoria = scanner.nextLine();
+
                     System.out.print("Digite a descrição do produto: ");
                     String descricao = scanner.nextLine();
-                    
+
                     System.out.print("Digite o preço do produto: ");
                     double preco = Double.parseDouble(scanner.nextLine());
-                    
+
                     System.out.print("Digite a quantidade em estoque do produto: ");
                     int quantidadeEstoque = Integer.parseInt(scanner.nextLine());
 
-                    Product product = new Product(nome, descricao, preco, quantidadeEstoque);
+                    Product product = new Product(nome, descricao, preco, quantidadeEstoque, categoria);
 
                     administrador.criarProduto(produtos, product);
 
-                    System.out.println("Nome: " + product.getNome());
-                    System.out.println("Descrição: " + product.getDescricao());
-                    System.out.println("Preço: " + product.getPreco());
-                    System.out.println("Quantidade em estoque: " + product.getQuantidadeEstoque());
+                    System.out.println(product.toString());
 
                     break;
                 case 2:
                     // administrador.criarUsuario(scanner, usuarios);
                     break;
                 case 3:
-                    // relatorioPedidoMaisCaro();
+                    OrdenarPedidosPorPreco();
+                    pedidos.get(0).toString();
                     break;
                 case 4:
-                    // relatorioProdutoMenorEstoque();
+                    OrdenarProdutosPorEstoque();
+                    produtos.get(0).toString();
                     break;
                 case 5:
                     return;
@@ -158,7 +174,7 @@ public class Main {
     }
 
     private static void menuUsuario(Scanner scanner) {
-        // Carrinho carrinho = new Carrinho();
+        ShoppingCart carrinho = new ShoppingCart();
 
         while (true) {
             System.out.println("Menu do Usuário");
@@ -168,35 +184,98 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    while (true) {
-                        System.out.println("1 - Add product");
-                        System.out.println("2 - View shopping cart");
-                        System.out.println("3 - Finish order");
-                        System.out.println("4 - Exit");
-                        int opcaoProduto = scanner.nextInt();
-
-                        switch (opcaoProduto) {
-                            case 1:
-                                // Lógica para adicionar um produto ao carrinho
-                                break;
-                            case 2:
-                                // Lógica para visualizar o carrinho
-                                break;
-                            case 3:
-                                // Lógica para finalizar a compra
-                                break;
-                            case 4:
-                                return;
-                            default:
-                                System.out.println("Opção inválida.");
-                        }
-                    }
+                    StarNewOrder(scanner, carrinho);
                 case 2:
                     return;
                 default:
                     System.out.println("Opção inválida.");
             }
         }
+    }
+
+    private static void StarNewOrder(Scanner scanner, ShoppingCart carrinho) {
+        while (true) {
+            Cliente cliente = new Cliente();
+            System.out.println("1 - Add product");
+            System.out.println("2 - View shopping cart");
+            System.out.println("3 - Finish order");
+            System.out.println("4 - Exit");
+            int opcaoProduto = scanner.nextInt();
+
+            switch (opcaoProduto) {
+                case 1:
+                    System.out.print("Digite o id do produto: ");
+                    int idProduto = scanner.nextInt();
+                    Product produto = null;
+
+                    for (int i = 0; i < produtos.size(); i++) {
+                        if (produtos.get(i).getId() == idProduto) {
+                            produto = produtos.get(i);
+                            break;
+                        }
+                    }
+
+                    if (produto != null) {
+                        carrinho.adicionarProduto(produto);
+                    } else {
+                        System.out.println("Produto não encontrado.");
+                    }
+
+                    break;
+                case 2:
+                    carrinho.VisualizarCarrinho();
+                    break;
+                case 3:
+                    if (cliente == null || carrinho.getProdutos().isEmpty()) {
+                        System.out.println("Não é possível finalizar o pedido. Verifique os dados do cliente e o carrinho.");
+                        return;
+                    }
+                    // int numeroPedido = gerarNumeroPedido();
+                    LocalDate data = LocalDate.now();
+
+                    // Calcular o total
+                    double total = carrinho.calcularTotal();
+
+                    // Criar o objeto Pedido
+                    Order pedido = new Order(data, new ArrayList<>(carrinho.produtos), total);
+
+                    // Adicionar o pedido ao histórico do cliente
+                    cliente.adicionarPedido(pedido);
+
+                    // Atualizar o estoque
+                    for (Product produto : carrinho.getProdutos()) {
+                        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - 1); // Simplificando, assumindo que só um item por produto é comprado
+                    }
+
+                    // Limpar o carrinho
+                    carrinho.getProdutos().clear();
+
+                    System.out.println("Pedido finalizado com sucesso! Número do pedido: " + numeroPedido);
+                    break;
+                case 4:
+                    return;
+                default:
+                    System.out.println("Opção inválida.");
+            }
+        }
+    }
+
+    private static void OrdenarPedidosPorPreco() {
+        Collections.sort(pedidos, new Comparator<Order>() {
+            @Override
+            public int compare(Order p1, Order p2) {
+                return Double.compare(p1.getTotalPedido(), p2.getTotalPedido());
+            }
+        });
+    }
+
+    private static void OrdenarProdutosPorEstoque() {
+        Collections.sort(produtos, new Comparator<Product>() {
+            @Override
+            public int compare(Product p1, Product p2) {
+                return Double.compare(p1.getQuantidadeEstoque(), p2.getQuantidadeEstoque());
+            }
+        });
     }
 
 }
