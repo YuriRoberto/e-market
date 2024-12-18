@@ -17,38 +17,37 @@ public class Main {
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        String arquivoUsuarios = "usuarios.txt"; // Nome do arquivo para armazenar os usuários
+        String usersFile = "users.txt";
 
         while (true) {
             System.out.println("1 - Login");
-            System.out.println("2 - Cadastro");
+            System.out.println("2 - Exit");
             System.out.print("Escolha uma opção: ");
             int opcao = scanner.nextInt();
 
             switch (opcao) {
                 case 1:
-                    login(scanner, arquivoUsuarios);
+                    login(scanner, usersFile);
                     break;
                 case 2:
-                    cadastrarUsuario(scanner, arquivoUsuarios);
-                    break;
+                    return;
                 default:
                     System.out.println("Opção inválida.");
             }
         }
     }
 
-    private static AtomicInteger contadorPedidos = new AtomicInteger(0);
-    private static int gerarNumeroPedido() {
-        return contadorPedidos.incrementAndGet();
+    private static AtomicInteger counterOrders = new AtomicInteger(0);
+    private static int generateOrderNumber() {
+        return counterOrders.incrementAndGet();
     }
 
-    private static List<Product> produtos = new ArrayList<>();
-    private static List<ShoppingCart> carrinho = new ArrayList<>();
-    private static List<Order> pedidos = new ArrayList<>();
+    private static List<Product> products = new ArrayList<>();
+    private static List<ShoppingCart> cart = new ArrayList<>();
+    private static List<Order> order = new ArrayList<>();
     // private static List<User> usuarios = new ArrayList<>();
 
-    private static void cadastrarUsuario(Scanner scanner, String arquivoUsuarios) {
+    private static void registerUser(Scanner scanner, String usersFile) {
         Console console = System.console();
         if (console == null) {
             System.err.println("Não é possível obter o console.");
@@ -60,23 +59,23 @@ public class Main {
         String email = scanner.nextLine();
 
         System.out.print("Digite sua senha: ");
-        char[] senhaChar = console.readPassword();
-        String senha = new String(senhaChar);
-        Arrays.fill(senhaChar, '\u0000');
+        char[] passwordChar = console.readPassword();
+        String password = new String(passwordChar);
+        Arrays.fill(passwordChar, '\u0000');
 
         System.out.print("É administrador? (s/n): ");
         String isAdministrador = scanner.nextLine().toLowerCase();
 
-        try (FileWriter fw = new FileWriter(arquivoUsuarios, true);
+        try (FileWriter fw = new FileWriter(usersFile, true);
                 BufferedWriter bw = new BufferedWriter(fw)) {
-            bw.write(email + ":" + senha + ":" + isAdministrador + "\n");
+            bw.write(email + ":" + password + ":" + isAdministrador + "\n");
             System.out.println("Usuário cadastrado com sucesso!");
         } catch (IOException e) {
             System.out.println("Erro ao cadastrar usuário: " + e.getMessage());
         }
     }
 
-    private static void login(Scanner scanner, String arquivoUsuarios) {
+    private static void login(Scanner scanner, String usersFile) {
         Console console = System.console();
         if (console == null) {
             System.err.println("Não é possível obter o console.");
@@ -87,24 +86,24 @@ public class Main {
         scanner.nextLine();
         String email = scanner.nextLine();
         System.out.print("Digite sua senha: ");
-        char[] senhaChar = console.readPassword();
-        String senha = new String(senhaChar);
+        char[] passwordChar = console.readPassword();
+        String password = new String(passwordChar);
 
         // Limpar o array de senha
-        Arrays.fill(senhaChar, '\u0000');
+        Arrays.fill(passwordChar, '\u0000');
 
-        try (BufferedReader br = new BufferedReader(new FileReader(arquivoUsuarios))) {
-            String linha;
-            while ((linha = br.readLine()) != null) {
-                String[] dados = linha.split(":");
-                if (dados[0].equals(email) && dados[1].equals(senha)) {
+        try (BufferedReader br = new BufferedReader(new FileReader(usersFile))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(":");
+                if (data[0].equals(email) && data[1].equals(password)) {
                     System.out.println("Login realizado com sucesso!");
-                    String tipoUsuario = dados[2];
-                    if (tipoUsuario.equals("s")) {
-                        Administrator adm = new Administrator(email, email, senha);
-                        menuAdministrador(scanner, adm);
+                    String userType = data[2];
+                    if (userType.equals("s")) {
+                        Administrator adm = new Administrator(email, email, password);
+                        menuAdministrator(scanner, adm, usersFile);
                     } else {
-                        menuUsuario(scanner);
+                        menuUser(scanner);
                     }
                     return;
                 }
@@ -116,7 +115,7 @@ public class Main {
         System.out.println("Email ou senha inválidos.");
     }
 
-    private static void menuAdministrador(Scanner scanner, Administrator administrador) {
+    private static void menuAdministrator(Scanner scanner, Administrator administrador, String usersFile) {
         while (true) {
             System.out.println("Menu do Administrador");
             System.out.println("1 - Create new product");
@@ -130,37 +129,37 @@ public class Main {
                 case 1:
                     System.out.print("Digite o nome do produto: ");
                     scanner.nextLine();
-                    String nome = scanner.nextLine();
+                    String name = scanner.nextLine();
 
                     System.out.print("Digite a categoria do produto: ");
-                    String categoria = scanner.nextLine();
+                    String category = scanner.nextLine();
 
                     System.out.print("Digite a descrição do produto: ");
-                    String descricao = scanner.nextLine();
+                    String description = scanner.nextLine();
 
                     System.out.print("Digite o preço do produto: ");
-                    double preco = Double.parseDouble(scanner.nextLine());
+                    double price = Double.parseDouble(scanner.nextLine());
 
                     System.out.print("Digite a quantidade em estoque do produto: ");
-                    int quantidadeEstoque = Integer.parseInt(scanner.nextLine());
+                    int quantityStock = Integer.parseInt(scanner.nextLine());
 
-                    Product product = new Product(nome, descricao, preco, quantidadeEstoque, categoria);
+                    Product product = new Product(name, description, price, quantityStock, category);
 
-                    administrador.criarProduto(produtos, product);
+                    administrador.createProduct(products, product);
 
                     System.out.println(product.toString());
 
                     break;
                 case 2:
-                    // administrador.criarUsuario(scanner, usuarios);
+                    registerUser(scanner, usersFile);
                     break;
                 case 3:
-                    OrdenarPedidosPorPreco();
-                    pedidos.get(0).toString();
+                    SortOrdersByPrice();
+                    order.get(0).toString();
                     break;
                 case 4:
-                    OrdenarProdutosPorEstoque();
-                    produtos.get(0).toString();
+                    SortProductsByStock();
+                    products.get(0).toString();
                     break;
                 case 5:
                     return;
@@ -170,8 +169,8 @@ public class Main {
         }
     }
 
-    private static void menuUsuario(Scanner scanner) {
-        ShoppingCart carrinho = new ShoppingCart();
+    private static void menuUser(Scanner scanner) {
+        ShoppingCart cart = new ShoppingCart();
 
         while (true) {
             System.out.println("Menu do Usuário");
@@ -181,7 +180,7 @@ public class Main {
 
             switch (opcao) {
                 case 1:
-                    StarNewOrder(scanner, carrinho);
+                    StarNewOrder(scanner, cart);
                 case 2:
                     return;
                 default:
@@ -190,75 +189,69 @@ public class Main {
         }
     }
 
-    private static void StarNewOrder(Scanner scanner, ShoppingCart carrinho) {
+    private static void StarNewOrder(Scanner scanner, ShoppingCart cart) {
         while (true) {
-            Client cliente = new Client();
+            Client client = new Client();
             System.out.println("1 - Add product");
             System.out.println("2 - View shopping cart");
             System.out.println("3 - Finish order");
             System.out.println("4 - Exit");
-            int opcaoProduto = scanner.nextInt();
+            int optionProduct = scanner.nextInt();
 
-            switch (opcaoProduto) {
+            switch (optionProduct) {
                 case 1:
                     System.out.print("Digite o id do produto: ");
-                    int idProduto = scanner.nextInt();
-                    Product produtoEncontrado = null;
+                    int idProduct = scanner.nextInt();
+                    Product productFind = null;
 
-                    for (int i = 0; i < produtos.size(); i++) {
-                        if (produtos.get(i).getId() == idProduto) {
-                            produtoEncontrado = produtos.get(i);
+                    for (int i = 0; i < products.size(); i++) {
+                        if (products.get(i).getId() == idProduct) {
+                            productFind = products.get(i);
                             break;
                         }
                     }
 
-                    if (produtoEncontrado != null) {
-                        carrinho.adicionarProduto(produtoEncontrado);
+                    if (productFind != null) {
+                        cart.addProduct(productFind);
                     } else {
                         System.out.println("Produto não encontrado.");
                     }
 
                     break;
                 case 2:
-                    carrinho.VisualizarCarrinho();
+                    cart.ViewCart();
                     break;
                 case 3:
-                    if (cliente == null || carrinho.getProdutos().isEmpty()) {
-                        System.out.println("Não é possível finalizar o pedido. Verifique os dados do cliente e o carrinho.");
+                    if (client == null || cart.getProduct().isEmpty()) {
+                        System.out.println("Não é possível finalizar o pedido. Verifique os dados do client e o carrinho.");
                         return;
                     }
-                    // int numeroPedido = gerarNumeroPedido();
                     LocalDate data = LocalDate.now();
-
-                    // Calcular o total
-                    double total = carrinho.calcularTotal();
-
-                    // Criar o objeto Pedido
-                    // Criar uma nova lista de OrderItem
+                    double total = cart.calculateTotal();
                     List<OrderItem> itensPedido = new ArrayList<>();
-                    for (Product produto : carrinho.getProdutos()) {
-                        OrderItem item = new OrderItem(produto, 1); // Cria um novo OrderItem com quantidade 1
+                    for (Product product : cart.getProduct()) {
+                        OrderItem item = new OrderItem(product, 1);
                         itensPedido.add(item);
                     }
 
                     // Gerar número do pedido (implemente sua lógica aqui)
-                    int numeroPedido = gerarNumeroPedido();
+                    int orderNumber = generateOrderNumber();
 
                     // Criar o objeto Pedido
-                    Order pedido = new Order(numeroPedido, data, itensPedido, total);
+                    Order order = new Order(orderNumber, data, itensPedido, total);
 
-                    // Adicionar o pedido ao histórico do cliente
-                    cliente.adicionarPedido(pedido);
+                    // Adicionar o pedido ao histórico do client
+                    client.addOrder(order);
 
                     // Atualizar o estoque
-                    for (Product produto : carrinho.getProdutos()) {
-                        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - 1);
+                    for (Product product : cart.getProduct()) {
+                        product.setQuantityStock(product.getQuantityStock() - 1);
                     }
 
-                    // Limpar o carrinho
-                    carrinho.getProdutos().clear();
+                    // Limpar o cart
+                    cart.getProduct().clear();
 
-                    System.out.println("Pedido finalizado com sucesso! Número do pedido: " + numeroPedido);
+                    System.out.println("Pedido finalizado com sucesso! Número do pedido: " + orderNumber);
                     break;
                 case 4:
                     return;
@@ -268,8 +261,8 @@ public class Main {
         }
     }
 
-    private static void OrdenarPedidosPorPreco() {
-        Collections.sort(pedidos, new Comparator<Order>() {
+    private static void SortOrdersByPrice() {
+        Collections.sort(order, new Comparator<Order>() {
             @Override
             public int compare(Order p1, Order p2) {
                 return Double.compare(p1.getTotalPedido(), p2.getTotalPedido());
@@ -277,11 +270,11 @@ public class Main {
         });
     }
 
-    private static void OrdenarProdutosPorEstoque() {
-        Collections.sort(produtos, new Comparator<Product>() {
+    private static void SortProductsByStock() {
+        Collections.sort(products, new Comparator<Product>() {
             @Override
             public int compare(Product p1, Product p2) {
-                return Double.compare(p1.getQuantidadeEstoque(), p2.getQuantidadeEstoque());
+                return Double.compare(p1.getQuantityStock(), p2.getQuantityStock());
             }
         });
     }

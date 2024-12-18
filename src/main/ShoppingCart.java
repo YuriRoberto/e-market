@@ -2,24 +2,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ShoppingCart {
-    private List<Product> produtos = new ArrayList<>();
+    private List<Product> products = new ArrayList<>();
 
-    public void adicionarProduto(Product produto) {
-        if (produto.estaEmEstoque()) {
-            produtos.add(produto);
+    public void addProduct(Product product) {
+        if (product.isInStock()) {
+            products.add(product);
             System.out.println("Produto adicionado ao carrinho.");
         } else {
             System.out.println("Produto indisponível em estoque.");
         }
     }
 
-    public void VisualizarCarrinho() {
-        if(produtos.isEmpty())
+    public void ViewCart() {
+        if(products.isEmpty())
             System.out.println("O carrinho está vazio.");
         else {
             String stringReturn = "";
-            for (int i = 0; i < produtos.size(); i++) {
-                stringReturn += produtos.get(i).toString();
+            for (int i = 0; i < products.size(); i++) {
+                stringReturn += products.get(i).toString();
                 stringReturn += "\n";
             }
             System.out.println(stringReturn);
@@ -27,14 +27,14 @@ public class ShoppingCart {
 
     }
 
-    public List<Product> getProdutos() {
-        return new ArrayList<>(produtos);
+    public List<Product> getProduct() {
+        return new ArrayList<>(products);
     }
 
-    public double calcularTotal() {
+    public double calculateTotal() {
         double total = 0.0;
-        for (Product produto : produtos) {
-            total += produto.getPreco();
+        for (Product product : products) {
+            total += product.getPrice();
         }
         return total;
     }

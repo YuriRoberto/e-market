@@ -1,13 +1,13 @@
 public class OrderItem {
-    private Product produto;
-    private int quantidade;
+    private Product product;
+    private int quantity;
 
-    public OrderItem(Product produto, int quantidade) {
-        this.produto = produto;
-        this.quantidade = quantidade;
+    public OrderItem(Product product, int quantity) {
+        this.product = product;
+        this.quantity = quantity;
     }
 
-    public double getPreco() {
-        return produto.getPreco() * quantidade;
+    public double getPrice() {
+        return product.getPrice() * quantity;
     }
 }

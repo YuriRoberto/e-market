@@ -3,20 +3,20 @@ public class Product {
     private static int contadorProdutos = 0; // Gerador automático de número do pedido
     
     private int id;
-    private String nome;
-    private String descricao;
-    private String categoria;
-    private double preco;
-    private int quantidadeEstoque;
+    private String name;
+    private String description;
+    private String category;
+    private double price;
+    private int quantityStock;
 
     // Construtor
-    public Product(String nome, String descricao, double preco, int quantidadeEstoque, String categoria) {
+    public Product(String name, String description, double price, int quantityStock, String category) {
         this.id = ++contadorProdutos;
-        this.nome = nome;
-        this.descricao = descricao;
-        this.categoria = categoria;
-        this.preco = preco;
-        this.quantidadeEstoque = quantidadeEstoque;
+        this.name = name;
+        this.description = description;
+        this.category = category;
+        this.price = price;
+        this.quantityStock = quantityStock;
     }
 
     // Getters e setters
@@ -28,75 +28,74 @@ public class Product {
         this.id = id;
     }
 
-    public String getNome() {
-        return nome;
+    public String getName() {
+        return name;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public String getCategoria() {
-        return categoria;
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
-    public double getPreco() {
-        return preco;
+    public double getPrice() {
+        return price;
     }
 
-    public void setPreco(double preco) {
-        this.preco = preco;
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public int getQuantidadeEstoque() {
-        return quantidadeEstoque;
+    public int getQuantityStock() {
+        return quantityStock;
     }
 
-    public void setQuantidadeEstoque(int quantidadeEstoque) {
-        this.quantidadeEstoque = quantidadeEstoque;
+    public void setQuantityStock(int quantityStock) {
+        this.quantityStock = quantityStock;
     }
 
     // Método para verificar se o produto está em estoque
-    public boolean estaEmEstoque() {
-        return quantidadeEstoque > 0;
+    public boolean isInStock() {
+        return quantityStock > 0;
     }
 
     // Método para adicionar quantidade ao estoque
-    public void adicionarEstoque(int quantidade) {
-        quantidadeEstoque += quantidade;
+    public void addStock(int quantity) {
+        quantityStock += quantity;
     }
 
     // Método para remover quantidade do estoque
-    public void removerEstoque(int quantidade) {
-        if (quantidadeEstoque >= quantidade) {
-            quantidadeEstoque -= quantidade;
+    public void removeStock(int quantity) {
+        if (quantityStock >= quantity) {
+            quantityStock -= quantity;
         } else {
             System.out.println("Quantidade insuficiente em estoque.");
         }
     }
 
-    // Método para obter uma representação em string do produto
     @Override
     public String toString() {
-        return "Produto{" +
+        return "Product{" +
                 "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", descricao='" + descricao + '\'' +
-                ", categoria='" + categoria + '\'' +
-                ", preco=" + preco +
-                ", quantidadeEstoque=" + quantidadeEstoque +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", category='" + category + '\'' +
+                ", price=" + price +
+                ", quantityStock=" + quantityStock +
                 '}';
     }
 }

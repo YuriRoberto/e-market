@@ -3,9 +3,9 @@ import java.util.ArrayList;
 
 class Client {
     private String address;
-    private List<Order> historicoCompras = new ArrayList<>();
+    private List<Order> historyPurchases = new ArrayList<>();
 
-    public void adicionarPedido(Order pedido) {
-        historicoCompras.add(pedido);
+    public void addOrder(Order order) {
+        historyPurchases.add(order);
     }
 }
