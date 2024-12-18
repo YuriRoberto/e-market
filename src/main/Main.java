@@ -11,17 +11,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Main {
-
-    class Cliente {
-        private String address;
-        private List<Order> historicoCompras = new ArrayList<>();
-    
-        public void adicionarPedido(Order pedido) {
-            historicoCompras.add(pedido);
-        }
-    }
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -44,6 +36,11 @@ public class Main {
                     System.out.println("Opção inválida.");
             }
         }
+    }
+
+    private static AtomicInteger contadorPedidos = new AtomicInteger(0);
+    private static int gerarNumeroPedido() {
+        return contadorPedidos.incrementAndGet();
     }
 
     private static List<Product> produtos = new ArrayList<>();
@@ -195,7 +192,7 @@ public class Main {
 
     private static void StarNewOrder(Scanner scanner, ShoppingCart carrinho) {
         while (true) {
-            Cliente cliente = new Cliente();
+            Client cliente = new Client();
             System.out.println("1 - Add product");
             System.out.println("2 - View shopping cart");
             System.out.println("3 - Finish order");
@@ -206,17 +203,17 @@ public class Main {
                 case 1:
                     System.out.print("Digite o id do produto: ");
                     int idProduto = scanner.nextInt();
-                    Product produto = null;
+                    Product produtoEncontrado = null;
 
                     for (int i = 0; i < produtos.size(); i++) {
                         if (produtos.get(i).getId() == idProduto) {
-                            produto = produtos.get(i);
+                            produtoEncontrado = produtos.get(i);
                             break;
                         }
                     }
 
-                    if (produto != null) {
-                        carrinho.adicionarProduto(produto);
+                    if (produtoEncontrado != null) {
+                        carrinho.adicionarProduto(produtoEncontrado);
                     } else {
                         System.out.println("Produto não encontrado.");
                     }
@@ -237,14 +234,25 @@ public class Main {
                     double total = carrinho.calcularTotal();
 
                     // Criar o objeto Pedido
-                    Order pedido = new Order(data, new ArrayList<>(carrinho.produtos), total);
+                    // Criar uma nova lista de OrderItem
+                    List<OrderItem> itensPedido = new ArrayList<>();
+                    for (Product produto : carrinho.getProdutos()) {
+                        OrderItem item = new OrderItem(produto, 1); // Cria um novo OrderItem com quantidade 1
+                        itensPedido.add(item);
+                    }
+
+                    // Gerar número do pedido (implemente sua lógica aqui)
+                    int numeroPedido = gerarNumeroPedido();
+
+                    // Criar o objeto Pedido
+                    Order pedido = new Order(numeroPedido, data, itensPedido, total);
 
                     // Adicionar o pedido ao histórico do cliente
                     cliente.adicionarPedido(pedido);
 
                     // Atualizar o estoque
                     for (Product produto : carrinho.getProdutos()) {
-                        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - 1); // Simplificando, assumindo que só um item por produto é comprado
+                        produto.setQuantidadeEstoque(produto.getQuantidadeEstoque() - 1);
                     }
 
                     // Limpar o carrinho

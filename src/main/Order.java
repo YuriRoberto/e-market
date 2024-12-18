@@ -1,62 +1,48 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-// public class Order {
-//     private Date date;
-//     private Status status;
-//     private Customer customer;
-//     private List<OrderItem> items;
-//     // ... outros atributos e métodos
-// }
-
-// Classe Pedido
 class Order {
-    private static int contadorPedidos = 0; // Gerador automático de número do pedido
-
     private int numeroPedido;
-    private Date dataPedido;
-    private List<Product> listaProdutos;
+    private LocalDate dataPedido;
+    private List<OrderItem> listaProdutos;
     private double totalPedido;
 
+    private static AtomicInteger contadorPedidos = new AtomicInteger(0);
+
     public Order() {
-        this.numeroPedido = ++contadorPedidos;
-        this.dataPedido = new Date(); // Define a data atual como data do pedido
+        this.numeroPedido = contadorPedidos.incrementAndGet();
+        this.dataPedido = LocalDate.now(); // Define a data atual como data do pedido
         this.listaProdutos = new ArrayList<>();
         this.totalPedido = 0.0;
     }
 
-    // // Adiciona um produto ao pedido
-    // public void adicionarProduto(Product produto) {
-    // listaProdutos.add(produto);
-    // recalcularTotal();
-    // }
-
-    // // Recalcula o total do pedido
-    // private void recalcularTotal() {
-    // totalPedido = listaProdutos.stream()
-    // .mapToDouble(Product::calcularTotal)
-    // .sum();
-    // }
+    public Order(int numeroPedido, LocalDate data, List<OrderItem> itensPedido, double total) {
+        this.numeroPedido = numeroPedido;
+        this.dataPedido = data;
+        this.listaProdutos = itensPedido;
+        this.totalPedido = total;
+    }
 
     public int getNumeroPedido() {
         return numeroPedido;
     }
 
-    public Date getDataPedido() {
+    public LocalDate getDataPedido() {
         return dataPedido;
     }
 
-    public List<Product> getListaProdutos() {
+    public List<OrderItem> getListaProdutos() {
         return listaProdutos;
     }
 
     public double getTotalPedido() {
-        for (int i = 0; i < listaProdutos.size(); i++) {
-            totalPedido += listaProdutos.get(i).getPreco();
+        double total = 0.0;
+        for (OrderItem item : listaProdutos) {
+            total += item.getPreco();
         }
-
-        return totalPedido;
+        return total;
     }
 
     @Override
@@ -65,7 +51,7 @@ class Order {
         sb.append("Pedido Nº: ").append(numeroPedido).append("\n");
         sb.append("Data: ").append(dataPedido).append("\n");
         sb.append("Produtos:\n");
-        for (Product p : listaProdutos) {
+        for (OrderItem p : listaProdutos) {
             sb.append(" - ").append(p).append("\n");
         }
         sb.append(String.format("Total do Pedido: R$ %.2f", totalPedido));
