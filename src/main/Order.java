@@ -40,7 +40,7 @@ class Order {
     public double getTotalPedido() {
         double total = 0.0;
         for (OrderItem item : listaProdutos) {
-            total += item.getPreco();
+            total += item.getPrice();
         }
         return total;
     }
