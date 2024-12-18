@@ -45,7 +45,6 @@ public class Main {
     private static List<Product> products = new ArrayList<>();
     private static List<ShoppingCart> cart = new ArrayList<>();
     private static List<Order> order = new ArrayList<>();
-    // private static List<User> usuarios = new ArrayList<>();
 
     private static void registerUser(Scanner scanner, String usersFile) {
         Console console = System.console();
@@ -233,22 +232,12 @@ public class Main {
                         OrderItem item = new OrderItem(product, 1);
                         itensPedido.add(item);
                     }
-
-                    // Gerar número do pedido (implemente sua lógica aqui)
                     int orderNumber = generateOrderNumber();
-
-                    // Criar o objeto Pedido
                     Order order = new Order(orderNumber, data, itensPedido, total);
-
-                    // Adicionar o pedido ao histórico do client
                     client.addOrder(order);
-
-                    // Atualizar o estoque
                     for (Product product : cart.getProduct()) {
                         product.setQuantityStock(product.getQuantityStock() - 1);
                     }
-
-                    // Limpar o cart
                     cart.getProduct().clear();
 
                     System.out.println("Pedido finalizado com sucesso! Número do pedido: " + orderNumber);

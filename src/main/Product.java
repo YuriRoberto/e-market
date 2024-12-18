@@ -1,6 +1,6 @@
 
 public class Product {
-    private static int contadorProdutos = 0; // Gerador automático de número do pedido
+    private static int contadorProdutos = 0;
     
     private int id;
     private String name;
@@ -9,7 +9,6 @@ public class Product {
     private double price;
     private int quantityStock;
 
-    // Construtor
     public Product(String name, String description, double price, int quantityStock, String category) {
         this.id = ++contadorProdutos;
         this.name = name;
@@ -19,7 +18,6 @@ public class Product {
         this.quantityStock = quantityStock;
     }
 
-    // Getters e setters
     public int getId() {
         return id;
     }
@@ -68,17 +66,14 @@ public class Product {
         this.quantityStock = quantityStock;
     }
 
-    // Método para verificar se o produto está em estoque
     public boolean isInStock() {
         return quantityStock > 0;
     }
 
-    // Método para adicionar quantidade ao estoque
     public void addStock(int quantity) {
         quantityStock += quantity;
     }
 
-    // Método para remover quantidade do estoque
     public void removeStock(int quantity) {
         if (quantityStock >= quantity) {
             quantityStock -= quantity;
